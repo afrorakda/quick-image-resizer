@@ -41,15 +41,29 @@
 
         .drop-zone {
             width: 100%;
-            padding: 40px 20px;
+            min-height: 160px;
+            padding: 20px;
             border: 2px dashed var(--accent);
             border-radius: var(--radius);
             background: var(--input-bg);
             cursor: pointer;
             margin-bottom: 25px;
             box-sizing: border-box;
-            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
+        .drop-zone img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            display: none;
+        }
+        .drop-zone.has-image p, .drop-zone.has-image span { display: none; }
+        .drop-zone.has-image img { display: block; }
+
         .drop-zone.dragover { border-color: var(--main); background: #f0f0f0; }
         .drop-zone p { font-size: 0.9rem; font-weight: 700; color: #999; margin: 0; }
         .drop-zone span { font-size: 0.75rem; color: #bbb; display: block; margin-top: 5px; }
@@ -72,6 +86,8 @@
             -webkit-text-fill-color: var(--main) !important;
             opacity: 1 !important;
         }
+        /* 透かしの色を #bbb に設定 */
+        input::placeholder { color: #bbb !important; -webkit-text-fill-color: #bbb !important; font-weight: 500; }
 
         .resize-btn {
             width: 100%;
@@ -89,10 +105,7 @@
         .resize-btn.active { display: block; }
         .resize-btn:active { transform: scale(0.98); opacity: 0.9; }
 
-        #preview-container { margin-top: 20px; text-align: left; display: none; }
-        #preview-container.active { display: block; }
-        .preview-img { width: 100%; border-radius: var(--radius); border: 1px solid var(--accent); }
-        .img-info { font-size: 0.75rem; font-weight: 700; color: #999; margin-top: 10px; text-align: center; }
+        .img-info { font-size: 0.75rem; font-weight: 700; color: #999; margin-top: -15px; margin-bottom: 25px; }
 
         footer { margin-top: 50px; font-size: 11px; color: #aaa; line-height: 1.8; }
         .footer-btns { margin-top: 30px; }
@@ -125,8 +138,9 @@
     <p class="subtitle">Resize images in your browser instantly. No upload, no tracking.</p>
 
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-        <p>Drop image here or click</p>
-        <span>Supports JPG, PNG, WebP</span>
+        <p id="dropText">Drop image here or click</p>
+        <span id="dropSubText">Supports JPG, PNG, WebP</span>
+        <img id="previewImg" alt="Preview">
     </div>
     <input type="file" id="fileInput" accept="image/*" style="display: none">
 
@@ -135,12 +149,8 @@
         <input type="number" id="widthInput" placeholder="e.g. 800" spellcheck="false">
     </div>
 
+    <p class="img-info" id="imgInfo"></p>
     <button class="resize-btn" id="resizeBtn" onclick="processImage()">Resize & Download</button>
-
-    <div id="preview-container">
-        <img id="previewImg" class="preview-img">
-        <p class="img-info" id="imgInfo"></p>
-    </div>
 
     <div class="footer-btns">
         <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕ Support me on Ko-fi</a>
@@ -168,14 +178,12 @@
     const dropZone = document.getElementById('dropZone');
     const widthInput = document.getElementById('widthInput');
     const resizeBtn = document.getElementById('resizeBtn');
-    const previewContainer = document.getElementById('preview-container');
     const previewImg = document.getElementById('previewImg');
     const imgInfo = document.getElementById('imgInfo');
 
     let originalImage = null;
     let fileName = 'resized-image';
 
-    // Drag and Drop
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', (e) => {
@@ -195,12 +203,18 @@
             img.onload = () => {
                 originalImage = img;
                 widthInput.value = img.width;
+                previewImg.src = e.target.result;
+                dropZone.classList.add('has-image');
                 resizeBtn.classList.add('active');
-                dropZone.querySelector('p').innerText = 'Image Loaded: ' + file.name;
+                updateInfo(img.width, img.height);
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+    }
+
+    function updateInfo(w, h) {
+        imgInfo.innerText = `Original: ${w} x ${h} px`;
     }
 
     function processImage() {
@@ -210,15 +224,11 @@
         const ctx = canvas.getContext('2d');
         const scale = widthInput.value / originalImage.width;
         canvas.width = parseInt(widthInput.value);
-        canvas.height = originalImage.height * scale;
+        canvas.height = Math.round(originalImage.height * scale);
 
         ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
 
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-        previewImg.src = dataUrl;
-        previewContainer.classList.add('active');
-        imgInfo.innerText = `Final size: ${canvas.width} x ${Math.round(canvas.height)} px`;
-
         const link = document.createElement('a');
         link.download = fileName + '.jpg';
         link.href = dataUrl;
