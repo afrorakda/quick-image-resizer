@@ -2,174 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quick Image Resizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Quick Image Resizer - Fridge Combo</title>
     
     <link rel="icon" href="image_34.png">
     <link rel="apple-touch-icon" href="image_34.png">
 
     <style>
         :root {
-            --main: #333;
             --bg: #fff;
+            --main: #333;
             --accent: #eee;
             --input-bg: #fafafa;
             --radius: 15px;
+            --placeholder: #bbb;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            margin: 0; padding: 0;
+            touch-action: manipulation; 
         }
 
         body {
+            background-color: var(--bg); color: var(--main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            padding: calc(env(safe-area-inset-top, 20px) + 10px) 20px env(safe-area-inset-bottom, 20px);
         }
 
-        .container {
-            width: 100%;
-            max-width: 420px;
-            padding: 40px 20px;
-            box-sizing: border-box;
-            text-align: center;
+        .fridge-container { width: 100%; max-width: 400px; display: flex; flex-direction: column; flex-grow: 1; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+
+        .hub-link {
+            text-decoration: none; font-size: 0.8rem; font-weight: 800; color: var(--main);
+            background: var(--accent); padding: 8px 12px; border-radius: 10px;
         }
 
-        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
-        .subtitle { font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 30px; }
+        .subtitle { font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 25px; text-align: center; }
 
         .drop-zone {
-            width: 100%;
-            min-height: 160px;
-            padding: 20px;
-            border: 2px dashed var(--accent);
-            border-radius: var(--radius);
-            background: var(--input-bg);
-            cursor: pointer;
-            margin-bottom: 25px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            width: 100%; min-height: 180px; padding: 20px; border: 2px dashed var(--accent);
+            border-radius: var(--radius); background: var(--input-bg); cursor: pointer;
+            margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; transition: transform 0.1s, background 0.2s;
         }
-        .drop-zone img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            display: none;
-        }
+        .drop-zone:active { transform: scale(0.98); }
+        .drop-zone img { max-width: 100%; max-height: 250px; border-radius: 10px; display: none; }
         .drop-zone.has-image p, .drop-zone.has-image span { display: none; }
         .drop-zone.has-image img { display: block; }
-
         .drop-zone.dragover { border-color: var(--main); background: #f0f0f0; }
-        .drop-zone p { font-size: 0.9rem; font-weight: 700; color: #999; margin: 0; }
-        .drop-zone span { font-size: 0.75rem; color: #bbb; display: block; margin-top: 5px; }
+        .drop-zone p { font-size: 0.9rem; font-weight: 800; color: #999; margin: 0; }
+        .drop-zone span { font-size: 0.75rem; color: #bbb; display: block; margin-top: 8px; font-weight: 600; }
 
-        .input-group { margin-bottom: 25px; text-align: left; }
-        label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; margin-left: 5px; color: #666; }
+        .input-group { margin-bottom: 20px; position: relative; width: 100%; }
+        label { display: block; font-size: 0.7rem; font-weight: 800; margin-bottom: 8px; margin-left: 5px; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid var(--accent);
-            border-radius: var(--radius);
-            background: var(--input-bg);
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--main) !important;
-            box-sizing: border-box;
-            outline: none;
-            -webkit-appearance: none;
-            -webkit-text-fill-color: var(--main) !important;
-            opacity: 1 !important;
+        .input-wrapper { position: relative; width: 100%; }
+        input[type="number"] {
+            width: 100%; padding: 18px; padding-right: 50px; border-radius: var(--radius);
+            border: 2px solid var(--accent); background: var(--input-bg);
+            font-size: 1rem; font-weight: 800; color: var(--main); outline: none;
+            -webkit-appearance: none; -webkit-text-fill-color: var(--main); opacity: 1 !important;
         }
-        /* 透かしの色を #bbb に設定 */
-        input::placeholder { color: #bbb !important; -webkit-text-fill-color: #bbb !important; font-weight: 500; }
+        input::placeholder { color: var(--placeholder) !important; -webkit-text-fill-color: var(--placeholder) !important; font-weight: 600; }
+
+        .clr-btn {
+            position: absolute; bottom: 12px; right: 12px; width: 34px; height: 34px;
+            background: rgba(0,0,0,0.05); color: #ccc; border: none; border-radius: 10px;
+            font-size: 20px; font-weight: bold; cursor: pointer; display: none;
+            align-items: center; justify-content: center; z-index: 10;
+        }
+
+        .img-info { font-size: 0.75rem; font-weight: 800; color: #bbb; margin-top: -10px; margin-bottom: 25px; text-align: center; }
 
         .resize-btn {
-            width: 100%;
-            padding: 18px;
-            background: #333;
-            color: #fff;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            font-weight: 800;
-            cursor: pointer;
-            margin-bottom: 30px;
-            display: none;
+            width: 100%; padding: 22px; background: var(--main); color: #fff;
+            border: none; border-radius: var(--radius); font-size: 1rem;
+            font-weight: 800; cursor: pointer; display: none; transition: background 0.2s, color 0.2s;
         }
         .resize-btn.active { display: block; }
-        .resize-btn:active { transform: scale(0.98); opacity: 0.9; }
+        .resize-btn:active { transform: scale(0.98); }
+        .btn-active-invert { background: #eee !important; color: #333 !important; }
 
-        .img-info { font-size: 0.75rem; font-weight: 700; color: #999; margin-top: -15px; margin-bottom: 25px; }
+        /* Footer */
+        .footer-btns { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0 30px; }
+        .kofi-btn, .home-btn {
+            width: 100%; max-width: 250px; padding: 14px; border-radius: var(--radius);
+            font-weight: 800; font-size: 0.9rem; text-decoration: none; text-align: center; border: none; cursor: pointer;
+        }
+        .kofi-btn { background: #fff; color: var(--main); border: 2px solid var(--main); }
+        .home-btn { background: var(--accent); color: var(--main); }
 
-        footer { margin-top: 50px; font-size: 11px; color: #aaa; line-height: 1.8; }
-        .footer-btns { margin-top: 30px; }
-        .kofi-btn {
-            display: inline-block; background: var(--main); color: #fff;
-            padding: 12px 25px; border-radius: var(--radius);
-            text-decoration: none; font-weight: bold; font-size: 14px; margin-bottom: 12px;
-        }
-        .home-btn {
-            display: block; width: 60%; margin: 0 auto; background: var(--accent);
-            color: var(--main); border: none; padding: 10px;
-            border-radius: var(--radius); font-weight: 700; font-size: 13px; cursor: pointer;
-        }
+        footer { font-size: 0.75rem; color: #bbb; text-align: center; padding-bottom: 20px; font-weight: 600; line-height: 1.6; }
+        footer a { color: inherit; text-decoration: underline; }
 
-        #modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
-        }
-        .modal-content {
-            background: #fff; width: 85%; max-width: 320px; padding: 30px;
-            border-radius: var(--radius); text-align: left; position: relative;
-        }
-        .close-x { position: absolute; top: 15px; right: 20px; font-size: 20px; color: #ccc; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 3000; }
+        .modal-content { background: #fff; padding: 30px; border-radius: var(--radius); width: 85%; max-width: 320px; position: relative; text-align: center; }
+        .close-icon { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; color: #aaa; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Quick Image Resizer</h1>
-    <p class="subtitle">Resize images in your browser instantly. No upload, no tracking.</p>
+<div class="fridge-container">
+    <header>
+        <h1>Resizer</h1>
+        <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
+    </header>
+
+    <p class="subtitle">Quick browser-based image resizing.</p>
 
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-        <p id="dropText">Drop image here or click</p>
-        <span id="dropSubText">Supports JPG, PNG, WebP</span>
+        <p id="dropText">Drop image or Tap</p>
+        <span id="dropSubText">JPG, PNG, WebP</span>
         <img id="previewImg" alt="Preview">
     </div>
     <input type="file" id="fileInput" accept="image/*" style="display: none">
 
     <div class="input-group">
         <label>Target Width (px)</label>
-        <input type="number" id="widthInput" placeholder="e.g. 800" spellcheck="false">
+        <div class="input-wrapper">
+            <input type="number" id="widthInput" placeholder="e.g. 800" spellcheck="false">
+            <button class="clr-btn" id="clrBtn">×</button>
+        </div>
     </div>
 
     <p class="img-info" id="imgInfo"></p>
     <button class="resize-btn" id="resizeBtn" onclick="processImage()">Resize & Download</button>
 
     <div class="footer-btns">
-        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕ Support me on Ko-fi</a>
-        <button class="home-btn" onclick="showModal()">Add to Home Screen</button>
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
+        <button class="home-btn" id="homeBtn">Add to Home Screen</button>
     </div>
 
-    <footer>
-        <div>No login / No tracking / No ads / Browser only</div>
-        <div>Privacy Policy / afrorakda © 2026</div>
+    <footer id="dynamicFooter">
+        No login / No tracking / No ads / Browser only<br>
+        <a href="https://afrorakda.com/privacy/">Privacy Policy</a><br>
+        afrorakda © 2026
     </footer>
 </div>
 
-<div id="modal" onclick="hideModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close-x" onclick="hideModal()">×</span>
-        <h3>📱 Install</h3>
-        <p>Add to your home screen.</p>
-        <p>🍏 <strong>iPhone (Safari):</strong><br>Tap Share, then Add to Home Screen.</p>
-        <p>🤖 <strong>Android (Chrome):</strong><br>Tap Menu (⋮), then Add to Home Screen.</p>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close-icon" id="closeModal">&times;</span>
+        <h3 style="margin-top:0; font-weight:800">📱 Install</h3>
+        <p style="margin: 15px 0; color: #666; font-size: 0.9rem;">Add to your home screen.</p>
+        <div style="text-align: left; font-size: 0.9rem; line-height: 1.6;">
+            <p>🍏 <b>iPhone (Safari):</b><br>Share > Add to Home Screen</p><br>
+            <p>🤖 <b>Android (Chrome):</b><br>Menu (⋮) > Add to home screen</p>
+        </div>
     </div>
 </div>
 
@@ -177,13 +164,28 @@
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
     const widthInput = document.getElementById('widthInput');
+    const clrBtn = document.getElementById('clrBtn');
     const resizeBtn = document.getElementById('resizeBtn');
     const previewImg = document.getElementById('previewImg');
     const imgInfo = document.getElementById('imgInfo');
 
     let originalImage = null;
-    let fileName = 'resized-image';
+    let fileName = 'resized';
 
+    // UI Logic
+    function toggleClr() {
+        clrBtn.style.display = widthInput.value ? "flex" : "none";
+    }
+
+    clrBtn.onclick = (e) => {
+        e.stopPropagation();
+        widthInput.value = "";
+        toggleClr();
+    };
+
+    widthInput.oninput = toggleClr;
+
+    // Drop Zone
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', (e) => {
@@ -206,15 +208,12 @@
                 previewImg.src = e.target.result;
                 dropZone.classList.add('has-image');
                 resizeBtn.classList.add('active');
-                updateInfo(img.width, img.height);
+                imgInfo.innerText = `Original: ${img.width} x ${img.height} px`;
+                toggleClr();
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
-    }
-
-    function updateInfo(w, h) {
-        imgInfo.innerText = `Original: ${w} x ${h} px`;
     }
 
     function processImage() {
@@ -222,21 +221,47 @@
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const scale = widthInput.value / originalImage.width;
-        canvas.width = parseInt(widthInput.value);
+        const targetWidth = parseInt(widthInput.value);
+        const scale = targetWidth / originalImage.width;
+        canvas.width = targetWidth;
         canvas.height = Math.round(originalImage.height * scale);
 
         ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
 
+        // Download & UI Feedback
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
         const link = document.createElement('a');
         link.download = fileName + '.jpg';
         link.href = dataUrl;
         link.click();
+
+        // 成功時の反転演出
+        const originalText = resizeBtn.textContent;
+        resizeBtn.textContent = "Saved!";
+        resizeBtn.classList.add('btn-active-invert');
+        setTimeout(() => {
+            resizeBtn.textContent = originalText;
+            resizeBtn.classList.remove('btn-active-invert');
+        }, 1200);
     }
 
+    // Modal
     function showModal() { document.getElementById('modal').style.display = 'flex'; }
-    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+    document.getElementById('homeBtn').onclick = showModal;
+    document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
+    window.onclick = (e) => { if (e.target == document.getElementById('modal')) document.getElementById('modal').style.display = 'none'; };
+
+    // Footer JSON
+    async function loadFooter() {
+        try {
+            const res = await fetch('footer.json');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.footerHtml) document.getElementById('dynamicFooter').innerHTML = data.footerHtml;
+            }
+        } catch(e) {}
+    }
+    window.onload = loadFooter;
 </script>
 
 </body>
