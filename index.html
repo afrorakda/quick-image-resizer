@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <title>Quick Image Resizer - Fridge Combo</title>
+    <title>Quick Resizer - Fridge Combo</title>
     
     <link rel="icon" href="image_34.png">
     <link rel="apple-touch-icon" href="image_34.png">
@@ -18,6 +18,7 @@
             --input-bg: #fafafa;
             --radius: 15px;
             --placeholder: #bbb;
+            --success: #2ecc71;
         }
 
         * { 
@@ -47,49 +48,72 @@
 
         .subtitle { font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 25px; text-align: center; }
 
-        .drop-zone {
-            width: 100%; min-height: 180px; padding: 20px; border: 2px dashed var(--accent);
+        /* Drop Zone */
+        .upload-zone {
+            width: 100%; min-height: 160px; padding: 20px; border: 2px dashed var(--accent);
             border-radius: var(--radius); background: var(--input-bg); cursor: pointer;
             margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            overflow: hidden; transition: transform 0.1s, background 0.2s;
+            overflow: hidden; transition: transform 0.1s, background 0.3s;
         }
-        .drop-zone:active { transform: scale(0.98); }
-        .drop-zone img { max-width: 100%; max-height: 250px; border-radius: 10px; display: none; }
-        .drop-zone.has-image p, .drop-zone.has-image span { display: none; }
-        .drop-zone.has-image img { display: block; }
-        .drop-zone.dragover { border-color: var(--main); background: #f0f0f0; }
-        .drop-zone p { font-size: 0.9rem; font-weight: 800; color: #999; margin: 0; }
-        .drop-zone span { font-size: 0.75rem; color: #bbb; display: block; margin-top: 8px; font-weight: 600; }
+        .upload-zone:active { transform: scale(0.98); }
+        .upload-zone img { max-width: 100%; max-height: 200px; border-radius: 10px; display: none; }
+        .upload-zone.has-image p, .upload-zone.has-image span { display: none; }
+        .upload-zone.has-image img { display: block; }
+        .upload-zone.dragover { border-color: var(--main); background: #f0f0f0; }
+        .upload-zone p { font-size: 0.9rem; font-weight: 800; color: #999; margin: 0; }
+        .upload-zone span { font-size: 0.75rem; color: #bbb; display: block; margin-top: 8px; font-weight: 600; }
 
-        .input-group { margin-bottom: 20px; position: relative; width: 100%; }
-        label { display: block; font-size: 0.7rem; font-weight: 800; margin-bottom: 8px; margin-left: 5px; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
+        @keyframes flash-hint {
+            0% { background: var(--input-bg); border-color: var(--accent); }
+            50% { background: var(--accent); border-color: var(--main); }
+            100% { background: var(--input-bg); border-color: var(--accent); }
+        }
+        .flash-active { animation: flash-hint 0.6s ease-out; }
 
-        .input-wrapper { position: relative; width: 100%; }
-        input[type="number"] {
-            width: 100%; padding: 18px; padding-right: 50px; border-radius: var(--radius);
+        /* Input Controls */
+        #controls { display: none; }
+        .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; position: relative; }
+        .input-group { flex: 1; position: relative; }
+        label { display: block; font-size: 0.65rem; font-weight: 800; margin-bottom: 5px; margin-left: 5px; color: #bbb; text-transform: uppercase; }
+        
+        input {
+            width: 100%; padding: 15px; border-radius: var(--radius);
             border: 2px solid var(--accent); background: var(--input-bg);
             font-size: 1rem; font-weight: 800; color: var(--main); outline: none;
             -webkit-appearance: none; -webkit-text-fill-color: var(--main); opacity: 1 !important;
         }
-        input::placeholder { color: var(--placeholder) !important; -webkit-text-fill-color: var(--placeholder) !important; font-weight: 600; }
+        input::placeholder { color: var(--placeholder) !important; -webkit-text-fill-color: var(--placeholder) !important; }
 
-        .clr-btn {
-            position: absolute; bottom: 12px; right: 12px; width: 34px; height: 34px;
-            background: rgba(0,0,0,0.05); color: #ccc; border: none; border-radius: 10px;
-            font-size: 20px; font-weight: bold; cursor: pointer; display: none;
-            align-items: center; justify-content: center; z-index: 10;
+        .chain-icon { font-size: 1.2rem; color: #ccc; margin-top: 20px; }
+
+        .scale-badge { font-size: 0.7rem; font-weight: 800; color: var(--main); background: var(--accent); padding: 4px 8px; border-radius: 8px; margin-top: 5px; display: inline-block; }
+
+        /* Format Chips */
+        .format-chips { display: flex; gap: 8px; margin: 15px 0 25px; justify-content: center; }
+        .chip {
+            padding: 10px 18px; border-radius: 12px; background: var(--input-bg); border: 2px solid var(--accent);
+            font-size: 0.8rem; font-weight: 800; color: #999; cursor: pointer; transition: 0.2s;
         }
+        .chip.active { background: var(--main); color: #fff; border-color: var(--main); }
 
-        .img-info { font-size: 0.75rem; font-weight: 800; color: #bbb; margin-top: -10px; margin-bottom: 25px; text-align: center; }
+        /* Stats Card */
+        .stats-card {
+            background: var(--input-bg); border: 2px solid var(--accent); border-radius: var(--radius);
+            padding: 20px; margin-bottom: 25px; text-align: center; display: none;
+        }
+        .stats-row { display: flex; justify-content: space-around; align-items: center; }
+        .stat-item { flex: 1; }
+        .stat-val { font-size: 1.1rem; font-weight: 900; display: block; }
+        .stat-label { font-size: 0.6rem; font-weight: 800; color: #bbb; text-transform: uppercase; }
+        .stat-arrow { font-size: 1rem; color: #ccc; font-weight: bold; }
 
         .resize-btn {
             width: 100%; padding: 22px; background: var(--main); color: #fff;
-            border: none; border-radius: var(--radius); font-size: 1rem;
-            font-weight: 800; cursor: pointer; display: none; transition: background 0.2s, color 0.2s;
+            border: none; border-radius: var(--radius); font-size: 1.1rem;
+            font-weight: 800; cursor: pointer; transition: background 0.2s, color 0.2s;
         }
-        .resize-btn.active { display: block; }
         .resize-btn:active { transform: scale(0.98); }
-        .btn-active-invert { background: #eee !important; color: #333 !important; }
+        .btn-success { background: var(--success) !important; }
 
         /* Footer */
         .footer-btns { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0 30px; }
@@ -116,25 +140,53 @@
         <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
     </header>
 
-    <p class="subtitle">Quick browser-based image resizing.</p>
+    <p class="subtitle">Smart resizing with real-time scaling.</p>
 
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-        <p id="dropText">Drop image or Tap</p>
-        <span id="dropSubText">JPG, PNG, WebP</span>
-        <img id="previewImg" alt="Preview">
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <p>Drop Image or Tap</p>
+        <span>JPG, PNG, WebP</span>
+        <img id="previewImg">
     </div>
     <input type="file" id="fileInput" accept="image/*" style="display: none">
 
-    <div class="input-group">
-        <label>Target Width (px)</label>
-        <div class="input-wrapper">
-            <input type="number" id="widthInput" placeholder="e.g. 800" spellcheck="false">
-            <button class="clr-btn" id="clrBtn">×</button>
+    <div id="controls">
+        <div class="input-row">
+            <div class="input-group">
+                <label>Width</label>
+                <input type="number" id="widthInput" placeholder="Width">
+            </div>
+            <div class="chain-icon">🔗</div>
+            <div class="input-group">
+                <label>Height</label>
+                <input type="number" id="heightInput" placeholder="Height">
+            </div>
         </div>
-    </div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span class="scale-badge" id="scaleBadge">100% Scale</span>
+        </div>
 
-    <p class="img-info" id="imgInfo"></p>
-    <button class="resize-btn" id="resizeBtn" onclick="processImage()">Resize & Download</button>
+        <div class="format-chips">
+            <div class="chip active" data-fmt="image/jpeg">JPG</div>
+            <div class="chip" data-fmt="image/png">PNG</div>
+            <div class="chip" data-fmt="image/webp">WEBP</div>
+        </div>
+
+        <div class="stats-card" id="statsCard">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span class="stat-label">Original</span>
+                    <span class="stat-val" id="origSize">0 KB</span>
+                </div>
+                <div class="stat-arrow">→</div>
+                <div class="stat-item">
+                    <span class="stat-label">Resized</span>
+                    <span class="stat-val" id="newSize" style="color:var(--success)">0 KB</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="resize-btn" id="resizeBtn" onclick="processImage()">Resize & Download</button>
+    </div>
 
     <div class="footer-btns">
         <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
@@ -161,97 +213,138 @@
 </div>
 
 <script>
+    let originalImage = null;
+    let originalFileSize = 0;
+    let ratio = 1;
+    let currentFormat = 'image/jpeg';
+    let baseFileName = 'resized';
+
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
-    const widthInput = document.getElementById('widthInput');
-    const clrBtn = document.getElementById('clrBtn');
-    const resizeBtn = document.getElementById('resizeBtn');
     const previewImg = document.getElementById('previewImg');
-    const imgInfo = document.getElementById('imgInfo');
+    const controls = document.getElementById('controls');
+    const wInput = document.getElementById('widthInput');
+    const hInput = document.getElementById('heightInput');
+    const scaleBadge = document.getElementById('scaleBadge');
+    const statsCard = document.getElementById('statsCard');
+    const resizeBtn = document.getElementById('resizeBtn');
 
-    let originalImage = null;
-    let fileName = 'resized';
-
-    // UI Logic
-    function toggleClr() {
-        clrBtn.style.display = widthInput.value ? "flex" : "none";
-    }
-
-    clrBtn.onclick = (e) => {
-        e.stopPropagation();
-        widthInput.value = "";
-        toggleClr();
-    };
-
-    widthInput.oninput = toggleClr;
-
-    // Drop Zone
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        handleFile(e.dataTransfer.files[0]);
+    // Format selection
+    document.querySelectorAll('.chip').forEach(chip => {
+        chip.onclick = () => {
+            document.querySelector('.chip.active').classList.remove('active');
+            chip.classList.add('active');
+            currentFormat = chip.dataset.fmt;
+        };
     });
 
-    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+    // W/H Chain Logic
+    wInput.oninput = () => {
+        if (!originalImage) return;
+        const val = parseInt(wInput.value);
+        if (val > 0) {
+            hInput.value = Math.round(val / ratio);
+            updateScale(val / originalImage.width);
+        }
+    };
 
+    hInput.oninput = () => {
+        if (!originalImage) return;
+        const val = parseInt(hInput.value);
+        if (val > 0) {
+            wInput.value = Math.round(val * ratio);
+            updateScale(wInput.value / originalImage.width);
+        }
+    };
+
+    function updateScale(s) {
+        scaleBadge.innerText = `${Math.round(s * 100)}% Scale (${s.toFixed(2)}x)`;
+    }
+
+    // File Handling
+    fileInput.onchange = (e) => handleFile(e.target.files[0]);
+    
     function handleFile(file) {
         if (!file || !file.type.startsWith('image/')) return;
-        fileName = file.name.split('.')[0] + '-resized';
+        originalFileSize = file.size;
+        baseFileName = file.name.split('.')[0];
+        
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
                 originalImage = img;
-                widthInput.value = img.width;
+                ratio = img.width / img.height;
+                wInput.value = img.width;
+                hInput.value = img.height;
                 previewImg.src = e.target.result;
                 dropZone.classList.add('has-image');
-                resizeBtn.classList.add('active');
-                imgInfo.innerText = `Original: ${img.width} x ${img.height} px`;
-                toggleClr();
+                controls.style.display = 'block';
+                statsCard.style.display = 'none';
+                updateScale(1);
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
 
-    function processImage() {
-        if (!originalImage || !widthInput.value) return;
+    async function processImage() {
+        if (!originalImage) return;
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const targetWidth = parseInt(widthInput.value);
-        const scale = targetWidth / originalImage.width;
-        canvas.width = targetWidth;
-        canvas.height = Math.round(originalImage.height * scale);
-
+        canvas.width = parseInt(wInput.value);
+        canvas.height = parseInt(hInput.value);
         ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
 
-        // Download & UI Feedback
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-        const link = document.createElement('a');
-        link.download = fileName + '.jpg';
-        link.href = dataUrl;
-        link.click();
+        const blob = await new Promise(r => canvas.toBlob(r, currentFormat, 0.9));
+        
+        // Show Stats
+        document.getElementById('origSize').innerText = formatSize(originalFileSize);
+        const newSizeEl = document.getElementById('newSize');
+        newSizeEl.innerText = "Calculated...";
+        statsCard.style.display = 'block';
 
-        // 成功時の反転演出
-        const originalText = resizeBtn.textContent;
-        resizeBtn.textContent = "Saved!";
-        resizeBtn.classList.add('btn-active-invert');
         setTimeout(() => {
-            resizeBtn.textContent = originalText;
-            resizeBtn.classList.remove('btn-active-invert');
-        }, 1200);
+            newSizeEl.innerText = formatSize(blob.size);
+            
+            // Download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const ext = currentFormat.split('/')[1];
+            a.download = `${baseFileName}-resized.${ext}`;
+            a.href = url;
+            a.click();
+            
+            // UI Success Feedback
+            resizeBtn.innerText = "Saved!";
+            resizeBtn.classList.add('btn-success');
+            
+            setTimeout(() => {
+                resizeBtn.innerText = "Resize & Download";
+                resizeBtn.classList.remove('btn-success');
+                resetUI();
+            }, 1500);
+        }, 300);
     }
 
-    // Modal
-    function showModal() { document.getElementById('modal').style.display = 'flex'; }
-    document.getElementById('homeBtn').onclick = showModal;
+    function formatSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function resetUI() {
+        dropZone.classList.add('flash-active');
+        setTimeout(() => dropZone.classList.remove('flash-active'), 700);
+    }
+
+    document.getElementById('homeBtn').onclick = () => document.getElementById('modal').style.display = 'flex';
     document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
     window.onclick = (e) => { if (e.target == document.getElementById('modal')) document.getElementById('modal').style.display = 'none'; };
 
-    // Footer JSON
     async function loadFooter() {
         try {
             const res = await fetch('footer.json');
