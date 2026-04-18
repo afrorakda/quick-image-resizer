@@ -48,7 +48,6 @@
 
         .subtitle { font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 25px; text-align: center; }
 
-        /* Drop Zone */
         .upload-zone {
             width: 100%; min-height: 160px; padding: 20px; border: 2px dashed var(--accent);
             border-radius: var(--radius); background: var(--input-bg); cursor: pointer;
@@ -70,42 +69,50 @@
         }
         .flash-active { animation: flash-hint 0.6s ease-out; }
 
-        /* Input Controls */
         #controls { display: none; }
-        .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; position: relative; }
+        .input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; position: relative; }
         .input-group { flex: 1; position: relative; }
-        label { display: block; font-size: 0.65rem; font-weight: 800; margin-bottom: 5px; margin-left: 5px; color: #bbb; text-transform: uppercase; }
+        label { display: block; font-size: 0.6rem; font-weight: 800; margin-bottom: 5px; margin-left: 5px; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input {
-            width: 100%; padding: 15px; border-radius: var(--radius);
+            width: 100%; padding: 15px; padding-right: 35px; border-radius: var(--radius);
             border: 2px solid var(--accent); background: var(--input-bg);
             font-size: 1rem; font-weight: 800; color: var(--main); outline: none;
             -webkit-appearance: none; -webkit-text-fill-color: var(--main); opacity: 1 !important;
         }
         input::placeholder { color: var(--placeholder) !important; -webkit-text-fill-color: var(--placeholder) !important; }
 
-        .chain-icon { font-size: 1.2rem; color: #ccc; margin-top: 20px; }
+        .clr-btn {
+            position: absolute; bottom: 10px; right: 10px; width: 28px; height: 28px;
+            background: rgba(0,0,0,0.05); color: #ccc; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: bold; cursor: pointer; display: none;
+            align-items: center; justify-content: center;
+        }
 
-        .scale-badge { font-size: 0.7rem; font-weight: 800; color: var(--main); background: var(--accent); padding: 4px 8px; border-radius: 8px; margin-top: 5px; display: inline-block; }
+        .chain-icon { font-size: 1rem; color: #ddd; margin-top: 18px; }
 
-        /* Format Chips */
-        .format-chips { display: flex; gap: 8px; margin: 15px 0 25px; justify-content: center; }
+        .scale-badge { 
+            font-size: 0.7rem; font-weight: 800; color: var(--main); background: var(--accent); 
+            padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: transform 0.1s;
+        }
+        .scale-badge:active { transform: scale(0.95); }
+
+        .format-chips { display: flex; gap: 8px; margin: 15px 0 20px; justify-content: center; }
         .chip {
             padding: 10px 18px; border-radius: 12px; background: var(--input-bg); border: 2px solid var(--accent);
             font-size: 0.8rem; font-weight: 800; color: #999; cursor: pointer; transition: 0.2s;
         }
         .chip.active { background: var(--main); color: #fff; border-color: var(--main); }
 
-        /* Stats Card */
         .stats-card {
             background: var(--input-bg); border: 2px solid var(--accent); border-radius: var(--radius);
-            padding: 20px; margin-bottom: 25px; text-align: center; display: none;
+            padding: 18px; margin-bottom: 25px; text-align: center;
         }
         .stats-row { display: flex; justify-content: space-around; align-items: center; }
         .stat-item { flex: 1; }
-        .stat-val { font-size: 1.1rem; font-weight: 900; display: block; }
+        .stat-val { font-size: 1rem; font-weight: 900; display: block; }
         .stat-label { font-size: 0.6rem; font-weight: 800; color: #bbb; text-transform: uppercase; }
-        .stat-arrow { font-size: 1rem; color: #ccc; font-weight: bold; }
+        .stat-arrow { font-size: 0.9rem; color: #ddd; }
 
         .resize-btn {
             width: 100%; padding: 22px; background: var(--main); color: #fff;
@@ -115,7 +122,6 @@
         .resize-btn:active { transform: scale(0.98); }
         .btn-success { background: var(--success) !important; }
 
-        /* Footer */
         .footer-btns { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0 30px; }
         .kofi-btn, .home-btn {
             width: 100%; max-width: 250px; padding: 14px; border-radius: var(--radius);
@@ -140,7 +146,7 @@
         <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
     </header>
 
-    <p class="subtitle">Smart resizing with real-time scaling.</p>
+    <p class="subtitle">Smart scaling with instant feedback.</p>
 
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
         <p>Drop Image or Tap</p>
@@ -153,16 +159,18 @@
         <div class="input-row">
             <div class="input-group">
                 <label>Width</label>
-                <input type="number" id="widthInput" placeholder="Width">
+                <input type="number" id="wIn" placeholder="W">
+                <button class="clr-btn" id="wClr">×</button>
             </div>
             <div class="chain-icon">🔗</div>
             <div class="input-group">
                 <label>Height</label>
-                <input type="number" id="heightInput" placeholder="Height">
+                <input type="number" id="hIn" placeholder="H">
+                <button class="clr-btn" id="hClr">×</button>
             </div>
         </div>
-        <div style="text-align: center; margin-bottom: 20px;">
-            <span class="scale-badge" id="scaleBadge">100% Scale</span>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span class="scale-badge" id="scaleBadge" title="Click to Reset">100% Scale (Reset)</span>
         </div>
 
         <div class="format-chips">
@@ -171,7 +179,7 @@
             <div class="chip" data-fmt="image/webp">WEBP</div>
         </div>
 
-        <div class="stats-card" id="statsCard">
+        <div class="stats-card">
             <div class="stats-row">
                 <div class="stat-item">
                     <span class="stat-label">Original</span>
@@ -179,7 +187,7 @@
                 </div>
                 <div class="stat-arrow">→</div>
                 <div class="stat-item">
-                    <span class="stat-label">Resized</span>
+                    <span class="stat-label" id="resLabel">Predicted</span>
                     <span class="stat-val" id="newSize" style="color:var(--success)">0 KB</span>
                 </div>
             </div>
@@ -219,143 +227,127 @@
     let currentFormat = 'image/jpeg';
     let baseFileName = 'resized';
 
-    const fileInput = document.getElementById('fileInput');
-    const dropZone = document.getElementById('dropZone');
-    const previewImg = document.getElementById('previewImg');
-    const controls = document.getElementById('controls');
-    const wInput = document.getElementById('widthInput');
-    const hInput = document.getElementById('heightInput');
+    const wIn = document.getElementById('wIn');
+    const hIn = document.getElementById('hIn');
+    const wClr = document.getElementById('wClr');
+    const hClr = document.getElementById('hClr');
     const scaleBadge = document.getElementById('scaleBadge');
-    const statsCard = document.getElementById('statsCard');
-    const resizeBtn = document.getElementById('resizeBtn');
+    const newSize = document.getElementById('newSize');
+    const resLabel = document.getElementById('resLabel');
 
-    // Format selection
+    // Clear Buttons Logic
+    const toggleClr = (input, btn) => btn.style.display = input.value ? "flex" : "none";
+    wIn.oninput = () => { sync('w'); toggleClr(wIn, wClr); toggleClr(hIn, hClr); predict(); };
+    hIn.oninput = () => { sync('h'); toggleClr(hIn, hClr); toggleClr(wIn, wClr); predict(); };
+    wClr.onclick = () => { wIn.value = ""; toggleClr(wIn, wClr); };
+    hClr.onclick = () => { hIn.value = ""; toggleClr(hIn, hClr); };
+
+    function sync(dir) {
+        if (!originalImage) return;
+        if (dir === 'w') {
+            const val = parseInt(wIn.value);
+            if (val > 0) hIn.value = Math.round(val / ratio);
+        } else {
+            const val = parseInt(hIn.value);
+            if (val > 0) wIn.value = Math.round(val * ratio);
+        }
+        updateBadge();
+    }
+
+    function updateBadge() {
+        const s = parseInt(wIn.value) / originalImage.width;
+        scaleBadge.innerText = isNaN(s) ? "Reset" : `${Math.round(s * 100)}% Scale (Reset)`;
+    }
+
+    scaleBadge.onclick = () => {
+        if (!originalImage) return;
+        wIn.value = originalImage.width;
+        hIn.value = originalImage.height;
+        updateBadge();
+        predict();
+        toggleClr(wIn, wClr); toggleClr(hIn, hClr);
+    };
+
     document.querySelectorAll('.chip').forEach(chip => {
         chip.onclick = () => {
             document.querySelector('.chip.active').classList.remove('active');
             chip.classList.add('active');
             currentFormat = chip.dataset.fmt;
+            predict();
         };
     });
 
-    // W/H Chain Logic
-    wInput.oninput = () => {
-        if (!originalImage) return;
-        const val = parseInt(wInput.value);
-        if (val > 0) {
-            hInput.value = Math.round(val / ratio);
-            updateScale(val / originalImage.width);
-        }
-    };
-
-    hInput.oninput = () => {
-        if (!originalImage) return;
-        const val = parseInt(hInput.value);
-        if (val > 0) {
-            wInput.value = Math.round(val * ratio);
-            updateScale(wInput.value / originalImage.width);
-        }
-    };
-
-    function updateScale(s) {
-        scaleBadge.innerText = `${Math.round(s * 100)}% Scale (${s.toFixed(2)}x)`;
-    }
-
-    // File Handling
-    fileInput.onchange = (e) => handleFile(e.target.files[0]);
-    
-    function handleFile(file) {
+    document.getElementById('fileInput').onchange = (e) => {
+        const file = e.target.files[0];
         if (!file || !file.type.startsWith('image/')) return;
         originalFileSize = file.size;
         baseFileName = file.name.split('.')[0];
-        
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
                 originalImage = img;
                 ratio = img.width / img.height;
-                wInput.value = img.width;
-                hInput.value = img.height;
-                previewImg.src = e.target.result;
-                dropZone.classList.add('has-image');
-                controls.style.display = 'block';
-                statsCard.style.display = 'none';
-                updateScale(1);
+                wIn.value = img.width; hIn.value = img.height;
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('dropZone').classList.add('has-image');
+                document.getElementById('controls').style.display = 'block';
+                document.getElementById('origSize').innerText = formatSize(originalFileSize);
+                updateBadge(); predict(); toggleClr(wIn, wClr); toggleClr(hIn, hClr);
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+    };
+
+    function predict() {
+        const s = parseInt(wIn.value) / originalImage.width;
+        if (isNaN(s)) return;
+        // 面積比に基づいた簡易予測
+        const pSize = originalFileSize * (s * s) * (currentFormat === 'image/png' ? 0.8 : 0.6);
+        resLabel.innerText = "Predicted";
+        newSize.innerText = "~" + formatSize(pSize);
     }
 
     async function processImage() {
         if (!originalImage) return;
-
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = parseInt(wInput.value);
-        canvas.height = parseInt(hInput.value);
+        canvas.width = parseInt(wIn.value);
+        canvas.height = parseInt(hIn.value);
+        
+        // 白背景で塗りつぶし（透過対策）
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
 
         const blob = await new Promise(r => canvas.toBlob(r, currentFormat, 0.9));
+        resLabel.innerText = "Saved";
+        newSize.innerText = formatSize(blob.size);
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.download = `${baseFileName}-resized.${currentFormat.split('/')[1]}`;
+        a.href = url; a.click();
         
-        // Show Stats
-        document.getElementById('origSize').innerText = formatSize(originalFileSize);
-        const newSizeEl = document.getElementById('newSize');
-        newSizeEl.innerText = "Calculated...";
-        statsCard.style.display = 'block';
-
+        const btn = document.getElementById('resizeBtn');
+        btn.innerText = "Saved!"; btn.classList.add('btn-success');
         setTimeout(() => {
-            newSizeEl.innerText = formatSize(blob.size);
-            
-            // Download
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const ext = currentFormat.split('/')[1];
-            a.download = `${baseFileName}-resized.${ext}`;
-            a.href = url;
-            a.click();
-            
-            // UI Success Feedback
-            resizeBtn.innerText = "Saved!";
-            resizeBtn.classList.add('btn-success');
-            
-            setTimeout(() => {
-                resizeBtn.innerText = "Resize & Download";
-                resizeBtn.classList.remove('btn-success');
-                resetUI();
-            }, 1500);
-        }, 300);
+            btn.innerText = "Resize & Download"; btn.classList.remove('btn-success');
+            document.getElementById('dropZone').classList.add('flash-active');
+            setTimeout(() => document.getElementById('dropZone').classList.remove('flash-active'), 700);
+        }, 1500);
     }
 
-    function formatSize(bytes) {
-        if (bytes === 0) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-    }
-
-    function resetUI() {
-        dropZone.classList.add('flash-active');
-        setTimeout(() => dropZone.classList.remove('flash-active'), 700);
+    function formatSize(b) {
+        if (b === 0) return '0 B';
+        const i = Math.floor(Math.log(b) / Math.log(1024));
+        return parseFloat((b / Math.pow(1024, i)).toFixed(1)) + ' ' + ['B', 'KB', 'MB'][i];
     }
 
     document.getElementById('homeBtn').onclick = () => document.getElementById('modal').style.display = 'flex';
     document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
     window.onclick = (e) => { if (e.target == document.getElementById('modal')) document.getElementById('modal').style.display = 'none'; };
-
-    async function loadFooter() {
-        try {
-            const res = await fetch('footer.json');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.footerHtml) document.getElementById('dynamicFooter').innerHTML = data.footerHtml;
-            }
-        } catch(e) {}
-    }
-    window.onload = loadFooter;
 </script>
-
 </body>
 </html>
